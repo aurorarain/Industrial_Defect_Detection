@@ -14,7 +14,7 @@
 
 ## 本地运行
 
-需要 Java 21。IDEA 直接打开本目录中的 `pom.xml`，运行 `DemoApplication`；也可双击 `start.bat` 或执行：
+需要 Java 17 或更高版本。IDEA 直接打开本目录中的 `pom.xml`，运行 `DemoApplication`；也可双击 `start.bat` 或执行：
 
 ```powershell
 .\mvnw.cmd spring-boot:run
