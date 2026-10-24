@@ -6,7 +6,7 @@
   <meta name="description" content="工业表面缺陷检测 Demo">
   <title>Inspectra · 工业缺陷检测</title>
   <link rel="stylesheet" href="app-v2.css">
-  <style>.batch-row{grid-template-columns:1.5fr .8fr .55fr .55fr 132px}.batch-actions{display:flex;gap:6px;justify-content:flex-end}.batch-delete{border:1px solid rgba(230,83,83,.28);background:#fff;color:#c33f3f;border-radius:8px;padding:8px 10px;font-size:10px}.batch-delete:hover{background:#fff2f2;border-color:#e65353}@media(max-width:720px){.batch-row{grid-template-columns:1fr auto}.batch-actions{grid-column:2;grid-row:1;flex-direction:column}}</style>
+  <style>.batch-row{grid-template-columns:1.5fr .8fr .55fr .55fr 196px}.batch-actions,.detail-actions,.detail-toolbar{display:flex;gap:6px;justify-content:flex-end;align-items:center}.batch-edit{border:1px solid #b8dce0;background:#eefafb;color:#176b73;border-radius:8px;padding:8px 10px;font-size:10px}.batch-delete{border:1px solid rgba(230,83,83,.28);background:#fff;color:#c33f3f;border-radius:8px;padding:8px 10px;font-size:10px}.batch-edit:hover{background:#dcf5f7}.batch-delete:hover{background:#fff2f2;border-color:#e65353}.mode-badge{padding:7px 10px;border-radius:7px;background:#edf2f4;color:#60727c;font-size:9px}.mode-badge.editing{background:#e4f9fa;color:#16727a}.detail-toolbar{justify-content:space-between;margin-bottom:24px}.detail-toolbar>div{display:flex;align-items:center;gap:10px}.detail-toolbar button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 13px;color:var(--ink);font-size:10px}.detail-toolbar button:hover:not(:disabled){border-color:#8fbec3;background:#f5fbfc}.detail-toolbar button:disabled{opacity:.4;cursor:not-allowed}.record-position{font-size:9px;color:var(--muted)}.readonly #uploadPanel{display:none}.readonly .detail-grid{grid-template-columns:minmax(280px,420px)}.readonly .image-card{cursor:default}.readonly .image-card:hover{background:#fff}@media(max-width:720px){.batch-row{grid-template-columns:1fr auto}.batch-actions{grid-column:2;grid-row:1;flex-direction:column}.detail-actions{justify-content:flex-start;flex-wrap:wrap}.detail-toolbar{align-items:flex-start}.detail-toolbar>div{display:grid;text-align:right}}</style>
 </head>
 <body>
   <div class="app-shell">
@@ -37,7 +37,7 @@
         </div>
         <div class="page-heading">
           <div><div class="eyebrow">INSPECTION WORKSPACE</div><h1>检测总览</h1><p>上传工业零部件图片，完成自动初检与人工复核。</p></div>
-          <div class="date-badge"><span>当前版本</span><strong>0.1.2</strong></div>
+          <div class="date-badge"><span>当前版本</span><strong>0.1.4</strong></div>
         </div>
         <div class="stats" id="globalStats">
           <article><span>检测批次</span><strong>0</strong><small>累计创建</small></article>
@@ -65,13 +65,13 @@
       </section>
 
       <section id="batch-detail" class="view">
-        <button class="back-button" data-view-target="dashboard">← 返回批次列表</button>
+        <div class="detail-toolbar"><button type="button" data-view-target="dashboard">← 返回批次列表</button><div><span class="record-position" id="recordPosition"></span><button type="button" id="nextBatch">查看下一条记录 →</button></div></div>
         <div class="page-heading detail-heading">
           <div><div class="eyebrow" id="detailId">BATCH</div><h1 id="detailName">批次详情</h1><p id="detailMeta"></p></div>
-          <a class="secondary export-link" id="exportLink">导出 CSV</a>
+          <div class="detail-actions"><span class="mode-badge" id="detailMode">只读查看</span><a class="secondary export-link" id="exportLink">导出 CSV</a></div>
         </div>
         <div class="detail-grid">
-          <section class="upload-panel">
+          <section class="upload-panel" id="uploadPanel">
             <div class="upload-copy"><span>01</span><div><h2>上传检测图片</h2><p>支持 JPG、PNG、WEBP，单张 10MB，单次最多 100MB。</p></div></div>
             <label class="drop-zone" id="dropZone">
               <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp">

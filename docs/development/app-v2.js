@@ -3,7 +3,7 @@ const DELIVERY = [
   { day: "首日 · 阶段 02", title: "Demo 主链路", output: "核心业务可以完整操作", tasks: [["完成批次与上传", "实现批次创建、列表、详情及多图上传。"], ["完成 Mock 检测", "返回 OK/NG、类别、置信度、检测框和耗时。"], ["完成人工复核", "允许修改最终判定、缺陷类别与备注。"], ["完成统计与 CSV", "页面统计与逐图导出形成交付闭环。"]] },
   { day: "首日 · 阶段 03", title: "工程化与验证", output: "不是只能演示一次的页面", tasks: [["加入 JSON 持久化", "服务重启后仍能读取批次与结果。"], ["加入自动化测试", "覆盖健康检查、建批次、上传、Mock 检测和统计。"], ["修复 IDEA 构建", "统一 Maven 3.9.11 与 Java 17。"]] },
   { day: "首日 · 阶段 04", title: "仓库与服务器", output: "公网可访问、代码可追踪", tasks: [["建立私有 GitHub 仓库", "代码、部署配置与开发文档统一进入 main。"], ["备份并清理旧服务器", "旧站与数据库完整备份后移除无关应用。"], ["部署公网 Demo", "配置 Nginx、systemd，并验证公网入口。"], ["准备自动部署", "加入 GitHub Actions，等待仓库 Secrets 启用。"]] },
-  { day: "当日收尾", title: "体验修复", output: "从能跑提升到可稳定演示", tasks: [["重做 Demo 视觉", "改善信息层级、移动端导航、图片展示和状态反馈。"], ["修复上传与复核 Bug", "补齐文件校验、失败恢复、重复选择和弹窗行为。"], ["重写开发日志", "用首日真实交付替代虚构的七天排期。"], ["打通场景选择与文档导航", "检测场景写入批次；文档滚动不再产生 Hash 历史。"], ["补齐批次删除", "二次确认后同步删除批次记录与上传图片。"]] }
+  { day: "当日收尾", title: "体验修复", output: "从能跑提升到可稳定演示", tasks: [["重做 Demo 视觉", "改善信息层级、移动端导航、图片展示和状态反馈。"], ["修复上传与复核 Bug", "补齐文件校验、失败恢复、重复选择和弹窗行为。"], ["重写开发日志", "用首日真实交付替代虚构的七天排期。"], ["打通场景选择与文档导航", "检测场景写入批次；文档滚动不再产生 Hash 历史。"], ["补齐批次删除", "二次确认后同步删除批次记录与上传图片。"], ["拆分查看与编辑", "只读查看、编辑操作、删除动作彼此独立；Markdown 使用阅读器渲染。"], ["补齐详情导航", "详情页提供返回批次列表和按当前模式查看下一条记录。"]] }
 ];
 
 const total = DELIVERY.reduce((sum, group) => sum + group.tasks.length, 0);
@@ -45,5 +45,5 @@ scrollButtons.forEach(button => button.onclick = () => {
 const observer = new IntersectionObserver(entries => { const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio-a.intersectionRatio)[0]; if(visible) links.forEach(link => link.classList.toggle("active", link.dataset.scrollTarget === visible.target.id)); }, { rootMargin:"-25% 0px -60%", threshold:[0,.2,.5] });
 links.map(link => document.getElementById(link.dataset.scrollTarget)).filter(Boolean).forEach(section => observer.observe(section));
 
-document.getElementById("exportButton").onclick = () => { const blob = new Blob([JSON.stringify({ version:"0.1.2", date:"2026-10-24", delivered:DELIVERY }, null, 2)], {type:"application/json"}); const link=document.createElement("a"); link.href=URL.createObjectURL(blob); link.download="首日开发交付记录.json"; link.click(); URL.revokeObjectURL(link.href); };
+document.getElementById("exportButton").onclick = () => { const blob = new Blob([JSON.stringify({ version:"0.1.4", date:"2026-10-24", delivered:DELIVERY }, null, 2)], {type:"application/json"}); const link=document.createElement("a"); link.href=URL.createObjectURL(blob); link.download="首日开发交付记录.json"; link.click(); URL.revokeObjectURL(link.href); };
 document.getElementById("resetButton").hidden = true;

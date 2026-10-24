@@ -27,6 +27,10 @@ class DemoApplicationTests {
 
 	@Test
 	void servesTheCompleteDevelopmentDocumentForBrowserReading() throws Exception {
+		mvc.perform(get("/docs/development.html"))
+				.andExpect(status().isOk())
+				.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+						.string(org.hamcrest.Matchers.containsString("id=\"document\"")));
 		mvc.perform(get("/docs/development.md"))
 				.andExpect(status().isOk())
 				.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
@@ -39,7 +43,8 @@ class DemoApplicationTests {
 	void completesTheMinimumInspectionFlow() throws Exception {
 		mvc.perform(get("/api/health"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value("UP"));
+				.andExpect(jsonPath("$.status").value("UP"))
+				.andExpect(jsonPath("$.version").value("0.1.4"));
 
 		String batchJson = mvc.perform(post("/api/batches")
 						.contentType(MediaType.APPLICATION_JSON)

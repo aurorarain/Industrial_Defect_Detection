@@ -3,6 +3,7 @@ let batches = [];
 let currentBatch = null;
 let currentFilter = "ALL";
 let selectedFiles = [];
+let currentMode = "view";
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_REQUEST_BYTES = 100 * 1024 * 1024;
@@ -63,10 +64,11 @@ function renderDashboard() {
       <div class="batch-cell"><strong>${escapeHtml(batch.partNumber || "未填写")}</strong><span>工件编号</span></div>
       <div class="batch-cell"><strong>${batchImages.length}</strong><span>图片</span></div>
       <div class="batch-cell"><strong class="${ng ? "ng" : "ok"}">${ng}</strong><span>NG</span></div>
-      <div class="batch-actions"><button class="batch-open" data-id="${batch.id}">查看</button><button class="batch-delete" data-id="${batch.id}" data-name="${escapeHtml(batch.name)}">删除</button></div>
+      <div class="batch-actions"><button class="batch-open" data-id="${batch.id}">查看</button><button class="batch-edit" data-id="${batch.id}">编辑</button><button class="batch-delete" data-id="${batch.id}" data-name="${escapeHtml(batch.name)}">删除</button></div>
     </article>`;
   }).join("");
-  $$(".batch-open").forEach(button => button.onclick = () => openBatch(button.dataset.id));
+  $$(".batch-open").forEach(button => button.onclick = () => openBatch(button.dataset.id, "view"));
+  $$(".batch-edit").forEach(button => button.onclick = () => openBatch(button.dataset.id, "edit"));
   $$(".batch-delete").forEach(button => button.onclick = () => deleteBatch(button.dataset.id, button.dataset.name));
 }
 
@@ -79,12 +81,22 @@ async function deleteBatch(id, name) {
   } catch (error) { toast(error.message); }
 }
 
-async function openBatch(id) {
+async function openBatch(id, mode = "view") {
   currentBatch = await request(`batches/${id}`);
+  currentMode = mode;
   $("#detailId").textContent = `BATCH / ${currentBatch.id}`;
   $("#detailName").textContent = currentBatch.name;
   $("#detailMeta").textContent = `${currentBatch.partNumber || "未填写工件编号"} · ${currentBatch.scene || "未指定场景"} · ${currentBatch.note || "暂无备注"}`;
   $("#exportLink").href = `${API}/batches/${id}/export`;
+  $("#batch-detail").classList.toggle("readonly", mode === "view");
+  $("#detailMode").textContent = mode === "view" ? "只读查看" : "编辑模式";
+  $("#detailMode").classList.toggle("editing", mode === "edit");
+  const currentIndex = batches.findIndex(batch => batch.id === id);
+  const nextBatch = currentIndex >= 0 ? batches[currentIndex + 1] : null;
+  $("#recordPosition").textContent = currentIndex >= 0 ? `第 ${currentIndex + 1} / ${batches.length} 条` : "";
+  $("#nextBatch").disabled = !nextBatch;
+  $("#nextBatch").dataset.nextId = nextBatch?.id || "";
+  $("#nextBatch").title = nextBatch ? `下一条：${nextBatch.name}` : "已经是最后一条记录";
   selectedFiles = [];
   $("#fileInput").value = "";
   updateDropZone();
@@ -115,7 +127,15 @@ function renderBatch() {
       <div class="image-info"><div><strong>${escapeHtml(image.originalName)}</strong><small>${result.category} · ${result.inferenceMs}ms</small></div>${result.reviewed ? '<span class="reviewed">✓ 已复核</span>' : ""}</div>
     </article>`;
   }).join("");
-  $$(".image-card").forEach(card => card.onclick = () => openReview(card.dataset.imageId));
+  $$(".image-card").forEach(card => {
+    if (currentMode === "edit") {
+      card.onclick = () => openReview(card.dataset.imageId);
+      card.title = "点击进行人工复核";
+    } else {
+      card.onclick = null;
+      card.title = "只读查看；请从批次列表进入编辑模式后复核";
+    }
+  });
 }
 
 function openReview(imageId) {
@@ -163,7 +183,7 @@ $("#batchForm").onsubmit = async event => {
     const batch = await request("batches", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     event.target.reset();
     await loadBatches();
-    await openBatch(batch.id);
+    await openBatch(batch.id, "edit");
     toast("批次创建成功");
   } catch (error) { toast(error.message); }
   finally { if (submitButton) submitButton.disabled = false; }
@@ -190,7 +210,7 @@ $("#uploadButton").onclick = async () => {
     selectedFiles = [];
     $("#fileInput").value = "";
     await loadBatches();
-    await openBatch(currentBatch.id);
+    await openBatch(currentBatch.id, "edit");
   } catch (error) { toast(error.message); }
   finally {
     $("#uploadButton").textContent = "上传并开始检测";
@@ -206,7 +226,7 @@ $("#reviewForm").onsubmit = async event => {
     await request(`batches/${currentBatch.id}/images/${data.imageId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     $("#reviewDialog").close();
     await loadBatches();
-    await openBatch(currentBatch.id);
+    await openBatch(currentBatch.id, "edit");
     toast("复核结果已保存");
   } catch (error) { toast(error.message); }
 };
@@ -223,6 +243,10 @@ $("#reviewForm").elements.category.onchange = event => {
 $$(`[data-view]`).forEach(item => item.onclick = () => showView(item.dataset.view));
 $$(`[data-view-target]`).forEach(item => item.onclick = () => showView(item.dataset.viewTarget));
 $("#quickCreate").onclick = () => showView("new-batch");
+$("#nextBatch").onclick = event => {
+  const nextId = event.currentTarget.dataset.nextId;
+  if (nextId) openBatch(nextId, currentMode);
+};
 $("#refreshButton").onclick = () => loadBatches().then(() => toast("数据已刷新"));
 $$(`[data-filter]`).forEach(button => button.onclick = () => {
   currentFilter = button.dataset.filter;

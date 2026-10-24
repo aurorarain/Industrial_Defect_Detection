@@ -39,7 +39,7 @@ public class InspectionController {
 
     @GetMapping("/health")
     public Map<String, Object> health() {
-        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.2", "time", Instant.now());
+        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.4", "time", Instant.now());
     }
 
     @GetMapping("/batches")
