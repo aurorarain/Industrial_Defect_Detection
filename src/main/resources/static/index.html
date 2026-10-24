@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="工业表面缺陷检测 Demo">
   <title>Inspectra · 工业缺陷检测</title>
-  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="app-v2.css">
 </head>
 <body>
   <div class="app-shell">
@@ -17,7 +17,7 @@
         <a class="nav-item" href="docs/"><span>◇</span>开发文档</a>
       </nav>
       <div class="model-card">
-        <div><span class="pulse"></span>推理服务正常</div>
+        <div><span class="pulse" id="servicePulse"></span><span id="serviceState">正在检查服务</span></div>
         <strong>Mock Engine v1</strong>
         <small>第一阶段 · 可替换适配器</small>
       </div>
@@ -25,11 +25,15 @@
 
     <main>
       <header>
-        <div><span class="environment">LOCAL / CPU</span><span id="apiStatus">连接中</span></div>
+        <div><span class="environment" id="environmentBadge">CPU DEMO</span><span id="apiStatus">连接中</span></div>
         <button class="primary compact" id="quickCreate">＋ 新建检测批次</button>
       </header>
 
       <section id="dashboard" class="view active">
+        <div class="welcome-strip">
+          <div><span>PHASE 01 · ONLINE</span><strong>最小检测闭环已上线</strong><small>当前使用确定性 Mock 引擎，适合演示流程，不代表真实模型精度。</small></div>
+          <button class="strip-action" data-view-target="new-batch">开始一次检测 <b>→</b></button>
+        </div>
         <div class="page-heading">
           <div><div class="eyebrow">INSPECTION WORKSPACE</div><h1>检测总览</h1><p>上传工业零部件图片，完成自动初检与人工复核。</p></div>
           <div class="date-badge"><span>当前版本</span><strong>0.1.0</strong></div>
@@ -67,7 +71,7 @@
         </div>
         <div class="detail-grid">
           <section class="upload-panel">
-            <div class="upload-copy"><span>01</span><div><h2>上传检测图片</h2><p>支持 JPG、PNG、WEBP，单次最多100MB。</p></div></div>
+            <div class="upload-copy"><span>01</span><div><h2>上传检测图片</h2><p>支持 JPG、PNG、WEBP，单张 10MB，单次最多 100MB。</p></div></div>
             <label class="drop-zone" id="dropZone">
               <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp">
               <div class="upload-icon">⇧</div><strong>点击选择或拖放图片</strong><small>第一阶段使用确定性 Mock 检测</small>
@@ -90,12 +94,12 @@
 
   <dialog id="reviewDialog">
     <form method="dialog" id="reviewForm">
-      <div class="dialog-head"><div><span>MANUAL REVIEW</span><h2>人工复核</h2></div><button value="cancel">×</button></div>
+      <div class="dialog-head"><div><span>MANUAL REVIEW</span><h2>人工复核</h2></div><button type="button" id="closeReview" aria-label="关闭复核窗口">×</button></div>
       <input type="hidden" name="imageId">
       <label><span>最终判定</span><select name="status"><option>OK</option><option>NG</option></select></label>
       <label><span>缺陷类别</span><select name="category"><option>无缺陷</option><option>划痕</option><option>磕碰</option><option>缺料</option><option>污渍</option><option>毛刺</option></select></label>
       <label><span>复核备注</span><textarea name="note" rows="3" placeholder="可选"></textarea></label>
-      <div class="form-actions"><button value="cancel" class="secondary">取消</button><button value="default" class="primary" id="saveReview">保存复核</button></div>
+      <div class="form-actions"><button type="button" id="cancelReview" class="secondary">取消</button><button type="submit" class="primary" id="saveReview">保存复核</button></div>
     </form>
   </dialog>
 

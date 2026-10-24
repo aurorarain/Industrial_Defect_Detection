@@ -3,6 +3,9 @@ let batches = [];
 let currentBatch = null;
 let currentFilter = "ALL";
 let selectedFiles = [];
+const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_REQUEST_BYTES = 100 * 1024 * 1024;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -16,7 +19,12 @@ function toast(message) {
 }
 
 async function request(url, options = {}) {
-  const response = await fetch(`${API}/${url}`, options);
+  let response;
+  try {
+    response = await fetch(`${API}/${url}`, options);
+  } catch {
+    throw new Error("无法连接检测服务，请稍后重试");
+  }
   if (!response.ok) {
     let message = "操作失败";
     try { message = (await response.json()).message || message; } catch {}
@@ -68,6 +76,7 @@ async function openBatch(id) {
   $("#detailMeta").textContent = `${currentBatch.partNumber || "未填写工件编号"} · ${currentBatch.note || "暂无备注"}`;
   $("#exportLink").href = `${API}/batches/${id}/export`;
   selectedFiles = [];
+  $("#fileInput").value = "";
   updateDropZone();
   renderBatch();
   showView("batch-detail");
@@ -115,8 +124,30 @@ function updateDropZone() {
   $("#uploadButton").disabled = !selectedFiles.length;
 }
 
+function selectFiles(fileList) {
+  const files = [...fileList];
+  const invalidType = files.find(file => !ALLOWED_TYPES.has(file.type));
+  const oversize = files.find(file => file.size > MAX_FILE_BYTES);
+  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+  if (invalidType) {
+    selectedFiles = [];
+    toast(`不支持 ${invalidType.name}，请选择 JPG、PNG 或 WEBP`);
+  } else if (oversize) {
+    selectedFiles = [];
+    toast(`${oversize.name} 超过单张 10MB 限制`);
+  } else if (totalSize > MAX_REQUEST_BYTES) {
+    selectedFiles = [];
+    toast("所选图片总大小超过 100MB");
+  } else {
+    selectedFiles = files;
+  }
+  updateDropZone();
+}
+
 $("#batchForm").onsubmit = async event => {
   event.preventDefault();
+  const submitButton = event.submitter;
+  if (submitButton) submitButton.disabled = true;
   const data = Object.fromEntries(new FormData(event.target));
   try {
     const batch = await request("batches", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
@@ -125,16 +156,16 @@ $("#batchForm").onsubmit = async event => {
     await openBatch(batch.id);
     toast("批次创建成功");
   } catch (error) { toast(error.message); }
+  finally { if (submitButton) submitButton.disabled = false; }
 };
 
-$("#fileInput").onchange = event => { selectedFiles = [...event.target.files]; updateDropZone(); };
+$("#fileInput").onchange = event => selectFiles(event.target.files);
 $("#dropZone").ondragover = event => { event.preventDefault(); event.currentTarget.classList.add("dragging"); };
 $("#dropZone").ondragleave = event => event.currentTarget.classList.remove("dragging");
 $("#dropZone").ondrop = event => {
   event.preventDefault();
   event.currentTarget.classList.remove("dragging");
-  selectedFiles = [...event.dataTransfer.files].filter(file => file.type.startsWith("image/"));
-  updateDropZone();
+  selectFiles(event.dataTransfer.files);
 };
 
 $("#uploadButton").onclick = async () => {
@@ -143,15 +174,21 @@ $("#uploadButton").onclick = async () => {
   $("#uploadButton").disabled = true;
   $("#uploadButton").textContent = "正在检测…";
   try {
+    const uploadedCount = selectedFiles.length;
     await request(`batches/${currentBatch.id}/images`, { method: "POST", body: form });
-    toast(`完成 ${selectedFiles.length} 张图片检测`);
+    toast(`完成 ${uploadedCount} 张图片检测`);
+    selectedFiles = [];
+    $("#fileInput").value = "";
     await loadBatches();
     await openBatch(currentBatch.id);
   } catch (error) { toast(error.message); }
-  finally { $("#uploadButton").textContent = "上传并开始检测"; }
+  finally {
+    $("#uploadButton").textContent = "上传并开始检测";
+    updateDropZone();
+  }
 };
 
-$("#saveReview").onclick = async event => {
+$("#reviewForm").onsubmit = async event => {
   event.preventDefault();
   const form = $("#reviewForm");
   const data = Object.fromEntries(new FormData(form));
@@ -162,6 +199,15 @@ $("#saveReview").onclick = async event => {
     await openBatch(currentBatch.id);
     toast("复核结果已保存");
   } catch (error) { toast(error.message); }
+};
+
+$("#closeReview").onclick = () => $("#reviewDialog").close();
+$("#cancelReview").onclick = () => $("#reviewDialog").close();
+$("#reviewForm").elements.status.onchange = event => {
+  if (event.target.value === "OK") $("#reviewForm").elements.category.value = "无缺陷";
+};
+$("#reviewForm").elements.category.onchange = event => {
+  $("#reviewForm").elements.status.value = event.target.value === "无缺陷" ? "OK" : "NG";
 };
 
 $$(`[data-view]`).forEach(item => item.onclick = () => showView(item.dataset.view));
@@ -178,5 +224,15 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 }
 
-request("health").then(() => { $("#apiStatus").textContent = "API 已连接"; }).catch(() => { $("#apiStatus").textContent = "API 离线"; });
+const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+$("#environmentBadge").textContent = isLocal ? "LOCAL / CPU" : "ALIYUN / CPU";
+request("health").then(() => {
+  $("#apiStatus").textContent = "API 已连接";
+  $("#serviceState").textContent = "检测服务运行中";
+  $("#servicePulse").classList.remove("offline");
+}).catch(() => {
+  $("#apiStatus").textContent = "API 离线";
+  $("#serviceState").textContent = "检测服务不可用";
+  $("#servicePulse").classList.add("offline");
+});
 loadBatches().catch(error => toast(error.message));

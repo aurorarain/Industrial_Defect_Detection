@@ -17,7 +17,7 @@
       <nav id="nav">
         <a class="active" href="#overview"><span>01</span>开发总览</a>
         <a href="#flow"><span>02</span>最小闭环</a>
-        <a href="#tasks"><span>03</span>7天任务</a>
+        <a href="#tasks"><span>03</span>首日交付</a>
         <a href="#architecture"><span>04</span>技术结构</a>
         <a href="#acceptance"><span>05</span>跑通标准</a>
         <a href="#boundary"><span>06</span>暂不开发</a>
@@ -54,7 +54,7 @@
           <div class="metrics">
             <article><span>当前版本</span><strong>0.1.0</strong><small>可运行基础版</small></article>
             <article><span>运行方式</span><strong>1 个 JAR</strong><small>适配 4G CPU 服务器</small></article>
-            <article><span>任务进度</span><strong id="metricProgress">0%</strong><small id="metricCount">0 / 18</small></article>
+            <article><span>首日交付</span><strong id="metricProgress">0%</strong><small id="metricCount">0 / 16</small></article>
             <article><span>阶段状态</span><strong class="accent">已上线</strong><small id="stageStatus">主链路已跑通</small></article>
           </div>
         </section>
@@ -75,13 +75,13 @@
             <span class="flow-arrow">→</span>
             <article class="flow-card"><b>05</b><div class="flow-icon">报</div><h3>统计报告</h3><p>展示结果并导出CSV。</p></article>
           </div>
-          <div class="decision-strip"><strong>开发原则</strong><span>先用假数据贯通五个页面，再接模型；先接固定模型，再训练客户模型。</span></div>
+          <div class="decision-strip"><strong>开发原则</strong><span>先用确定性 Mock 贯通一条完整业务链，再接固定 ONNX 模型；先证明流程，再扩大范围。</span></div>
         </section>
 
         <section id="tasks" class="section observe">
           <div class="section-heading">
-            <div><span class="section-index">03</span><h2>7天基础开发</h2></div>
-            <p>勾选后自动保存。每天只追一个可以展示的结果。</p>
+            <div><span class="section-index">03</span><h2>第一天实际交付</h2></div>
+            <p>不是预估排期，而是 2026-10-24 当天已经完成并验证的工作记录。</p>
           </div>
           <div class="progress-panel">
             <div class="progress-copy"><span>整体进度</span><strong id="progressText">0%</strong></div>
@@ -135,7 +135,7 @@
         <section id="acceptance" class="section observe">
           <div class="section-heading">
             <div><span class="section-index">05</span><h2>什么叫真正跑通</h2></div>
-            <p>不是“代码写了”，而是下面八项全部可现场演示。</p>
+            <p>以下能力已经完成实现；带“待实测”的项目需要在真实使用场景中持续验证。</p>
           </div>
           <div class="acceptance-grid">
             <article><b>01</b><h3>一键启动</h3><p>Windows双击或一条命令启动前后端。</p></article>
@@ -153,7 +153,7 @@
         <section id="boundary" class="section observe">
           <div class="section-heading">
             <div><span class="section-index">06</span><h2>这阶段坚决不做</h2></div>
-            <p>删掉这些，才可能在7天内真正跑通。</p>
+            <p>第一天能跑通，是因为主动压住了这些范围。</p>
           </div>
           <div class="boundary-grid">
             <article><span>×</span><div><h3>不接产线</h3><p>工业相机、RTSP、PLC、机械剔除留到付费POC。</p></div></article>
@@ -171,7 +171,7 @@
             <p>后续工作由证据触发，不按想象提前开发。</p>
           </div>
           <div class="roadmap">
-            <article class="current"><span>现在</span><h3>基本链路</h3><p>假数据或固定模型，完成五屏闭环。</p><b>7天</b></article>
+            <article class="current"><span>第 1 天完成</span><h3>基本链路上线</h3><p>Mock 检测、复核、统计、CSV、GitHub 与服务器全部跑通。</p><b>2026-10-24</b></article>
             <article><span>下一步</span><h3>真实模型</h3><p>有合规数据后训练、评估、导出ONNX。</p><b>2–3周</b></article>
             <article><span>客户触发</span><h3>付费POC</h3><p>按具体工件、缺陷与验收指标适配。</p><b>2–4周</b></article>
             <article><span>证据齐全</span><h3>软著V1.0</h3><p>冻结代码、说明书、截图与权属材料。</p><b>提交1件</b></article>
@@ -204,6 +204,6 @@
       </div>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="app-v2.js"></script>
 </body>
 </html>
