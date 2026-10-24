@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="工业表面缺陷检测 Demo">
+  <title>Inspectra · 工业缺陷检测</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside>
+      <div class="brand"><span class="brand-icon">I</span><div><strong>Inspectra</strong><small>Defect Intelligence</small></div></div>
+      <nav>
+        <button class="nav-item active" data-view="dashboard"><span>⌁</span>检测总览</button>
+        <button class="nav-item" data-view="new-batch"><span>＋</span>新建批次</button>
+        <a class="nav-item" href="docs/"><span>◇</span>开发文档</a>
+      </nav>
+      <div class="model-card">
+        <div><span class="pulse"></span>推理服务正常</div>
+        <strong>Mock Engine v1</strong>
+        <small>第一阶段 · 可替换适配器</small>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <div><span class="environment">LOCAL / CPU</span><span id="apiStatus">连接中</span></div>
+        <button class="primary compact" id="quickCreate">＋ 新建检测批次</button>
+      </header>
+
+      <section id="dashboard" class="view active">
+        <div class="page-heading">
+          <div><div class="eyebrow">INSPECTION WORKSPACE</div><h1>检测总览</h1><p>上传工业零部件图片，完成自动初检与人工复核。</p></div>
+          <div class="date-badge"><span>当前版本</span><strong>0.1.0</strong></div>
+        </div>
+        <div class="stats" id="globalStats">
+          <article><span>检测批次</span><strong>0</strong><small>累计创建</small></article>
+          <article><span>检测图片</span><strong>0</strong><small>累计处理</small></article>
+          <article><span>OK</span><strong class="ok">0</strong><small>正常样本</small></article>
+          <article><span>NG</span><strong class="ng">0</strong><small>异常样本</small></article>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h2>最近批次</h2><p>选择批次查看图片与检测结果</p></div><button class="text-button" id="refreshButton">刷新数据</button></div>
+          <div id="batchList" class="batch-list"></div>
+        </div>
+      </section>
+
+      <section id="new-batch" class="view">
+        <div class="page-heading"><div><div class="eyebrow">NEW INSPECTION</div><h1>新建检测批次</h1><p>先创建批次，再上传待检测图片。</p></div></div>
+        <form id="batchForm" class="form-panel">
+          <label><span>批次名称 *</span><input name="name" required placeholder="例如：轴承外圈 2026-10-24"></label>
+          <div class="form-row">
+            <label><span>工件编号</span><input name="partNumber" placeholder="例如：BR-6205"></label>
+            <label><span>检测场景</span><select disabled><option>肉眼可见表面缺陷</option></select></label>
+          </div>
+          <label><span>批次备注</span><textarea name="note" rows="4" placeholder="记录来源、拍摄条件或客户要求"></textarea></label>
+          <div class="form-actions"><button type="button" class="secondary" data-view-target="dashboard">取消</button><button class="primary" type="submit">创建并上传图片 →</button></div>
+        </form>
+      </section>
+
+      <section id="batch-detail" class="view">
+        <button class="back-button" data-view-target="dashboard">← 返回批次列表</button>
+        <div class="page-heading detail-heading">
+          <div><div class="eyebrow" id="detailId">BATCH</div><h1 id="detailName">批次详情</h1><p id="detailMeta"></p></div>
+          <a class="secondary export-link" id="exportLink">导出 CSV</a>
+        </div>
+        <div class="detail-grid">
+          <section class="upload-panel">
+            <div class="upload-copy"><span>01</span><div><h2>上传检测图片</h2><p>支持 JPG、PNG、WEBP，单次最多100MB。</p></div></div>
+            <label class="drop-zone" id="dropZone">
+              <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp">
+              <div class="upload-icon">⇧</div><strong>点击选择或拖放图片</strong><small>第一阶段使用确定性 Mock 检测</small>
+            </label>
+            <button class="primary full" id="uploadButton" disabled>上传并开始检测</button>
+          </section>
+          <section class="summary-panel" id="batchStats">
+            <div class="summary-title"><span>02</span><h2>本批统计</h2></div>
+            <div class="donut" style="--rate:0"><div><strong>0%</strong><small>合格率</small></div></div>
+            <div class="summary-values"><div><span>总数</span><strong>0</strong></div><div><span>OK</span><strong class="ok">0</strong></div><div><span>NG</span><strong class="ng">0</strong></div></div>
+          </section>
+        </div>
+        <div class="panel result-panel">
+          <div class="panel-head"><div><h2>检测结果</h2><p>点击结果可以完成人工复核</p></div><div class="filter-group"><button class="filter active" data-filter="ALL">全部</button><button class="filter" data-filter="OK">OK</button><button class="filter" data-filter="NG">NG</button></div></div>
+          <div id="imageGrid" class="image-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="reviewDialog">
+    <form method="dialog" id="reviewForm">
+      <div class="dialog-head"><div><span>MANUAL REVIEW</span><h2>人工复核</h2></div><button value="cancel">×</button></div>
+      <input type="hidden" name="imageId">
+      <label><span>最终判定</span><select name="status"><option>OK</option><option>NG</option></select></label>
+      <label><span>缺陷类别</span><select name="category"><option>无缺陷</option><option>划痕</option><option>磕碰</option><option>缺料</option><option>污渍</option><option>毛刺</option></select></label>
+      <label><span>复核备注</span><textarea name="note" rows="3" placeholder="可选"></textarea></label>
+      <div class="form-actions"><button value="cancel" class="secondary">取消</button><button value="default" class="primary" id="saveReview">保存复核</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

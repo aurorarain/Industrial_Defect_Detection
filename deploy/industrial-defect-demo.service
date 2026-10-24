@@ -1,0 +1,16 @@
+[Unit]
+Description=Industrial Defect Detection Demo
+After=network.target
+
+[Service]
+Type=simple
+User=adminjzh
+WorkingDirectory=/opt/industrial-defect-demo
+Environment=DEMO_DATA_DIR=/opt/industrial-defect-demo/data
+ExecStart=/usr/bin/java -Xms128m -Xmx768m -jar /opt/industrial-defect-demo/app.jar
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+

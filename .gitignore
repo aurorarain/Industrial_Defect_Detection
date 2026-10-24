@@ -1,0 +1,10 @@
+target/
+.idea/
+*.iml
+.vscode/
+data/runtime/
+*.log
+.DS_Store
+*.pem
+*.key
+
