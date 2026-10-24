@@ -34,16 +34,16 @@ body::before {
 
 .shell { min-height: 100vh; }
 .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--sidebar); padding: 28px 18px; border-right: 1px solid var(--line); background: rgba(10,13,18,.94); backdrop-filter: blur(16px); z-index: 20; display: flex; flex-direction: column; }
-.brand { display: flex; gap: 12px; align-items: center; padding: 0 10px 32px; }
+.brand { display: flex; gap: 12px; align-items: center; width: 100%; padding: 0 10px 32px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; background: var(--lime); color: #101400; border-radius: 11px; font-weight: 900; letter-spacing: -.04em; }
 .brand strong, .brand small { display: block; }
 .brand strong { font-size: 15px; }
 .brand small { margin-top: 3px; color: var(--muted); font-size: 11px; }
 nav { display: grid; gap: 5px; }
-nav a { display: flex; gap: 13px; align-items: center; padding: 11px 12px; color: var(--muted); border-radius: 9px; font-size: 13px; transition: .2s ease; }
-nav a span { font: 10px ui-monospace, monospace; color: var(--faint); }
-nav a:hover, nav a.active { color: var(--ink); background: var(--panel-2); }
-nav a.active span { color: var(--lime); }
+nav button { display: flex; gap: 13px; align-items: center; width: 100%; padding: 11px 12px; border: 0; color: var(--muted); background: transparent; border-radius: 9px; text-align: left; font-size: 13px; cursor: pointer; transition: .2s ease; }
+nav button span { font: 10px ui-monospace, monospace; color: var(--faint); }
+nav button:hover, nav button.active { color: var(--ink); background: var(--panel-2); }
+nav button.active span { color: var(--lime); }
 .sidebar-foot { margin-top: auto; border-top: 1px solid var(--line); padding: 18px 10px 0; display: flex; align-items: center; gap: 10px; }
 .sidebar-foot strong, .sidebar-foot small { display: block; }
 .sidebar-foot strong { font-size: 12px; }
@@ -69,7 +69,7 @@ h1 em { color: var(--muted); font-style: normal; font-weight: 420; }
 .hero-actions { display: flex; align-items: center; gap: 22px; margin-top: 30px; }
 .primary-button { padding: 12px 19px; border-radius: 9px; background: var(--lime); color: #111600; font-weight: 800; font-size: 13px; }
 .primary-button:hover { background: #dcff42; }
-.text-link { color: var(--muted); font-size: 12px; }
+.text-link { padding: 0; border: 0; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
 .text-link:hover { color: var(--ink); }
 .metrics { margin-top: 70px; display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .metrics article { padding: 22px 24px; background: rgba(17,22,30,.72); border-right: 1px solid var(--line); }

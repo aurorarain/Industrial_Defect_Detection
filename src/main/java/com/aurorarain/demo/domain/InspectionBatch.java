@@ -8,6 +8,7 @@ public record InspectionBatch(
         String id,
         String name,
         String partNumber,
+        String scene,
         String note,
         Instant createdAt,
         List<InspectionImage> images
@@ -17,6 +18,6 @@ public record InspectionBatch(
     }
 
     public InspectionBatch withImages(List<InspectionImage> nextImages) {
-        return new InspectionBatch(id, name, partNumber, note, createdAt, nextImages);
+        return new InspectionBatch(id, name, partNumber, scene, note, createdAt, nextImages);
     }
 }

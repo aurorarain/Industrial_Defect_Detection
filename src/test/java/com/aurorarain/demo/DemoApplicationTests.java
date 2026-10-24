@@ -32,9 +32,10 @@ class DemoApplicationTests {
 
 		String batchJson = mvc.perform(post("/api/batches")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{\"name\":\"自动化验收批次\",\"partNumber\":\"TEST-001\"}"))
+						.content("{\"name\":\"自动化验收批次\",\"partNumber\":\"TEST-001\",\"scene\":\"机加工金属件\"}"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").isNotEmpty())
+				.andExpect(jsonPath("$.scene").value("机加工金属件"))
 				.andReturn().getResponse().getContentAsString();
 		String batchId = batchJson.split("\"id\":\"")[1].split("\"")[0];
 

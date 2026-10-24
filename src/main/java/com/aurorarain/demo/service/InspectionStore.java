@@ -59,9 +59,9 @@ public class InspectionStore {
         return Optional.ofNullable(batches.get(id));
     }
 
-    public synchronized InspectionBatch create(String name, String partNumber, String note) throws IOException {
+    public synchronized InspectionBatch create(String name, String partNumber, String scene, String note) throws IOException {
         InspectionBatch batch = new InspectionBatch(
-                shortId(), name.trim(), clean(partNumber), clean(note), Instant.now(), List.of());
+                shortId(), name.trim(), clean(partNumber), scene.trim(), clean(note), Instant.now(), List.of());
         batches.put(batch.id(), batch);
         save();
         return batch;

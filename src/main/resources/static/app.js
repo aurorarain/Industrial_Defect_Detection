@@ -73,7 +73,7 @@ async function openBatch(id) {
   currentBatch = await request(`batches/${id}`);
   $("#detailId").textContent = `BATCH / ${currentBatch.id}`;
   $("#detailName").textContent = currentBatch.name;
-  $("#detailMeta").textContent = `${currentBatch.partNumber || "未填写工件编号"} · ${currentBatch.note || "暂无备注"}`;
+  $("#detailMeta").textContent = `${currentBatch.partNumber || "未填写工件编号"} · ${currentBatch.scene || "未指定场景"} · ${currentBatch.note || "暂无备注"}`;
   $("#exportLink").href = `${API}/batches/${id}/export`;
   selectedFiles = [];
   $("#fileInput").value = "";

@@ -38,7 +38,7 @@ public class InspectionController {
 
     @GetMapping("/health")
     public Map<String, Object> health() {
-        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.0", "time", Instant.now());
+        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.1", "time", Instant.now());
     }
 
     @GetMapping("/batches")
@@ -53,7 +53,7 @@ public class InspectionController {
 
     @PostMapping("/batches")
     public InspectionBatch createBatch(@Valid @RequestBody BatchRequest request) throws Exception {
-        return store.create(request.name(), request.partNumber(), request.note());
+        return store.create(request.name(), request.partNumber(), request.scene(), request.note());
     }
 
     @PostMapping(value = "/batches/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -109,7 +109,7 @@ public class InspectionController {
         return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
     }
 
-    public record BatchRequest(@NotBlank String name, String partNumber, String note) {}
+    public record BatchRequest(@NotBlank String name, String partNumber, @NotBlank String scene, String note) {}
     public record ReviewRequest(String status, String category, String note) {}
 
     private static String csvCell(String value) {
