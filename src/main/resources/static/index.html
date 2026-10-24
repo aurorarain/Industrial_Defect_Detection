@@ -6,6 +6,7 @@
   <meta name="description" content="工业表面缺陷检测 Demo">
   <title>Inspectra · 工业缺陷检测</title>
   <link rel="stylesheet" href="app-v2.css">
+  <style>.batch-row{grid-template-columns:1.5fr .8fr .55fr .55fr 132px}.batch-actions{display:flex;gap:6px;justify-content:flex-end}.batch-delete{border:1px solid rgba(230,83,83,.28);background:#fff;color:#c33f3f;border-radius:8px;padding:8px 10px;font-size:10px}.batch-delete:hover{background:#fff2f2;border-color:#e65353}@media(max-width:720px){.batch-row{grid-template-columns:1fr auto}.batch-actions{grid-column:2;grid-row:1;flex-direction:column}}</style>
 </head>
 <body>
   <div class="app-shell">
@@ -17,7 +18,7 @@
         <a class="nav-item" href="docs/"><span>◇</span>开发文档</a>
       </nav>
       <div class="model-card">
-        <div><span class="pulse" id="servicePulse"></span><span id="serviceState">正在检查服务</span></div>
+        <div><span class="pulse" id="servicePulse"></span><span id="serviceState">正在检查后端</span></div>
         <strong>Mock Engine v1</strong>
         <small>第一阶段 · 可替换适配器</small>
       </div>
@@ -25,7 +26,7 @@
 
     <main>
       <header>
-        <div><span class="environment" id="environmentBadge">CPU DEMO</span><span id="apiStatus">连接中</span></div>
+        <div><span class="environment" id="environmentBadge">CPU DEMO</span><span id="apiStatus">后端连接中</span></div>
         <button class="primary compact" id="quickCreate">＋ 新建检测批次</button>
       </header>
 
@@ -36,7 +37,7 @@
         </div>
         <div class="page-heading">
           <div><div class="eyebrow">INSPECTION WORKSPACE</div><h1>检测总览</h1><p>上传工业零部件图片，完成自动初检与人工复核。</p></div>
-          <div class="date-badge"><span>当前版本</span><strong>0.1.1</strong></div>
+          <div class="date-badge"><span>当前版本</span><strong>0.1.2</strong></div>
         </div>
         <div class="stats" id="globalStats">
           <article><span>检测批次</span><strong>0</strong><small>累计创建</small></article>

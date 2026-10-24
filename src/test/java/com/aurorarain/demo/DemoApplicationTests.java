@@ -9,6 +9,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,16 @@ class DemoApplicationTests {
 
 	@Test
 	void contextLoads() {
+	}
+
+	@Test
+	void servesTheCompleteDevelopmentDocumentForBrowserReading() throws Exception {
+		mvc.perform(get("/docs/development.md"))
+				.andExpect(status().isOk())
+				.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+						.contentTypeCompatibleWith("text/markdown"))
+				.andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+						.string(org.hamcrest.Matchers.containsString("# 工业缺陷检测 Demo 开发文档")));
 	}
 
 	@Test
@@ -41,13 +52,22 @@ class DemoApplicationTests {
 
 		MockMultipartFile image = new MockMultipartFile(
 				"files", "sample.png", "image/png", "phase-one-test-image".getBytes());
-		mvc.perform(multipart("/api/batches/{id}/images", batchId).file(image))
+		String imageJson = mvc.perform(multipart("/api/batches/{id}/images", batchId).file(image))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].result.modelVersion").value("mock-v1"));
+				.andExpect(jsonPath("$[0].result.modelVersion").value("mock-v1"))
+				.andReturn().getResponse().getContentAsString();
+		String storedName = imageJson.split("\"storedName\":\"")[1].split("\"")[0];
 
 		mvc.perform(get("/api/batches/{id}/stats", batchId))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.total").value(1));
+
+		mvc.perform(delete("/api/batches/{id}", batchId))
+				.andExpect(status().isNoContent());
+		mvc.perform(get("/api/batches/{id}", batchId))
+				.andExpect(status().isBadRequest());
+		mvc.perform(get("/api/files/{storedName}", storedName))
+				.andExpect(status().isBadRequest());
 	}
 
 }

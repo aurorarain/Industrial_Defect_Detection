@@ -63,10 +63,20 @@ function renderDashboard() {
       <div class="batch-cell"><strong>${escapeHtml(batch.partNumber || "未填写")}</strong><span>工件编号</span></div>
       <div class="batch-cell"><strong>${batchImages.length}</strong><span>图片</span></div>
       <div class="batch-cell"><strong class="${ng ? "ng" : "ok"}">${ng}</strong><span>NG</span></div>
-      <button class="batch-open" data-id="${batch.id}">查看</button>
+      <div class="batch-actions"><button class="batch-open" data-id="${batch.id}">查看</button><button class="batch-delete" data-id="${batch.id}" data-name="${escapeHtml(batch.name)}">删除</button></div>
     </article>`;
   }).join("");
   $$(".batch-open").forEach(button => button.onclick = () => openBatch(button.dataset.id));
+  $$(".batch-delete").forEach(button => button.onclick = () => deleteBatch(button.dataset.id, button.dataset.name));
+}
+
+async function deleteBatch(id, name) {
+  if (!window.confirm(`确定删除批次“${name}”吗？\n该批次的检测记录和上传图片将一并删除，且无法恢复。`)) return;
+  try {
+    await request(`batches/${id}`, { method: "DELETE" });
+    await loadBatches();
+    toast("批次已删除");
+  } catch (error) { toast(error.message); }
 }
 
 async function openBatch(id) {
@@ -227,12 +237,12 @@ function escapeHtml(value) {
 const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 $("#environmentBadge").textContent = isLocal ? "LOCAL / CPU" : "ALIYUN / CPU";
 request("health").then(() => {
-  $("#apiStatus").textContent = "API 已连接";
-  $("#serviceState").textContent = "检测服务运行中";
+  $("#apiStatus").textContent = "后端服务正常";
+  $("#serviceState").textContent = "检测后端运行中";
   $("#servicePulse").classList.remove("offline");
 }).catch(() => {
-  $("#apiStatus").textContent = "API 离线";
-  $("#serviceState").textContent = "检测服务不可用";
+  $("#apiStatus").textContent = "后端服务离线";
+  $("#serviceState").textContent = "检测后端不可用";
   $("#servicePulse").classList.add("offline");
 });
 loadBatches().catch(error => toast(error.message));

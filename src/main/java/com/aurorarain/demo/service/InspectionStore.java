@@ -59,6 +59,16 @@ public class InspectionStore {
         return Optional.ofNullable(batches.get(id));
     }
 
+    public synchronized void delete(String id) throws IOException {
+        InspectionBatch batch = requireBatch(id);
+        for (InspectionImage image : batch.images()) {
+            Path target = uploads.resolve(image.storedName()).normalize();
+            if (target.startsWith(uploads)) Files.deleteIfExists(target);
+        }
+        batches.remove(id);
+        save();
+    }
+
     public synchronized InspectionBatch create(String name, String partNumber, String scene, String note) throws IOException {
         InspectionBatch batch = new InspectionBatch(
                 shortId(), name.trim(), clean(partNumber), scene.trim(), clean(note), Instant.now(), List.of());

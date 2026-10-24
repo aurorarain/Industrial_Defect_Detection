@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ public class InspectionController {
 
     @GetMapping("/health")
     public Map<String, Object> health() {
-        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.1", "time", Instant.now());
+        return Map.of("status", "UP", "service", "industrial-defect-demo", "version", "0.1.2", "time", Instant.now());
     }
 
     @GetMapping("/batches")
@@ -54,6 +55,12 @@ public class InspectionController {
     @PostMapping("/batches")
     public InspectionBatch createBatch(@Valid @RequestBody BatchRequest request) throws Exception {
         return store.create(request.name(), request.partNumber(), request.scene(), request.note());
+    }
+
+    @DeleteMapping("/batches/{id}")
+    public ResponseEntity<Void> deleteBatch(@PathVariable String id) throws Exception {
+        store.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/batches/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
